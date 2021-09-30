@@ -47,5 +47,10 @@ ALTER TABLE questions
     ALTER COLUMN question_date SET DATA TYPE timestamp with time zone
     USING
         timestamp with time zone 'epoch' + question_date * interval '1 millisecond';
+        
+ALTER TABLE answers
+    ALTER COLUMN date SET DATA TYPE timestamp with time zone
+    USING
+        timestamp with time zone 'epoch' + date * interval '1 millisecond';
 
 
