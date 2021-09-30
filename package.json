@@ -4,6 +4,7 @@
   "description": "A system desgin capstone module, this API service endpoint handles questions and answers routes",
   "main": "index.js",
   "scripts": {
+    "start-dev": "npx nodemon server/index.js -w",
     "test": "test"
   },
   "repository": {

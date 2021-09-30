@@ -47,10 +47,12 @@ ALTER TABLE questions
     ALTER COLUMN question_date SET DATA TYPE timestamp with time zone
     USING
         timestamp with time zone 'epoch' + question_date * interval '1 millisecond';
-        
+
 ALTER TABLE answers
     ALTER COLUMN date SET DATA TYPE timestamp with time zone
     USING
         timestamp with time zone 'epoch' + date * interval '1 millisecond';
 
-
+-- SELECT setval(‘questions_question_id_seq’,3518964, true);
+-- SELECT setval(‘answers_id_seq’,6879307, true);
+-- SELECT setval(‘answersphotos_id_seq’,2063760, true);
