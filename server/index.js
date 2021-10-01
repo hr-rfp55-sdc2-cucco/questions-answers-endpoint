@@ -25,7 +25,7 @@ app.get('/qa/questions', (req, res) => {
         return db.getAllAnswersByQuestionID(question.question_id)
           .then((answers) => answers.map((a) => {
             return {
-              answer_id: a.id,
+              id: a.id,
               body: a.body,
               date: a.date,
               answerer_name: a.answerer_name,
@@ -38,6 +38,8 @@ app.get('/qa/questions', (req, res) => {
         .then((promiseResults) => {
           // console.log(promiseResults);
           return dataQ.map((q, i) => {
+            let ansObj = {};
+            promiseResults[i].forEach((ans) => ansObj[ans.id] = ans);
             return {
               question_id: q.question_id,
               question_body: q.question_body,
@@ -45,11 +47,14 @@ app.get('/qa/questions', (req, res) => {
               asker_name: q.asker_name,
               question_helpfulness: q.helpful,
               reported: q.reported,
-              answers: promiseResults[i],
+              answers: ansObj,
             }
           });
         })
-        .then((result) => res.end(JSON.stringify(result)))
+        .then((results) => res.json({
+          product_id: req.query.product_id,
+          results,
+        }))
         .catch((err) => console.error(err));
     })
     .catch((err) => console.error(err));
