@@ -64,9 +64,6 @@ const getPhotosByAnswersID = (answerID) => {
 
 // pool.end();
 
-getPhotosByAnswersID(5);
-
-
 module.exports = {
   getQuestionsByProductID,
   getAllAnswersByQuestionID,

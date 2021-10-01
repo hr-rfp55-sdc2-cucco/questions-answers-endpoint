@@ -9,7 +9,7 @@ DROP TABLE questions;
 
 
 CREATE TABLE questions (
-  question_id bigserial PRIMARY KEY,
+  question_id serial PRIMARY KEY,
   product_id int,
   question_body text,
   question_date bigint,
@@ -20,7 +20,7 @@ CREATE TABLE questions (
 );
 
 CREATE TABLE answers (
-  id bigserial PRIMARY KEY,
+  id serial PRIMARY KEY,
   question_id int REFERENCES questions (question_id),
   body text,
   date bigint,
@@ -32,7 +32,7 @@ CREATE TABLE answers (
 
 
 CREATE TABLE answerphotos (
-  id bigserial PRIMARY KEY,
+  id serial PRIMARY KEY,
   answer_id int REFERENCES answers (id),
   url text
 );
@@ -56,3 +56,11 @@ ALTER TABLE answers
 -- SELECT setval(‘questions_question_id_seq’,3518964, true);
 -- SELECT setval(‘answers_id_seq’,6879307, true);
 -- SELECT setval(‘answersphotos_id_seq’,2063760, true);
+
+CREATE INDEX questions_by_pid_reported_index ON questions (product_id, reported);
+CREATE INDEX answers_by_qid_reported_index ON answers (question_id, reported);
+CREATE INDEX answerphotos_by_answer_id_index ON answerphotos (answer_id);
+
+SELECT setval(pg_get_serial_sequence('questions', 'question_id'), 3518963);
+SELECT setval(pg_get_serial_sequence('answers', 'id'), 6879306);
+SELECT setval(pg_get_serial_sequence('answerphotos', 'id'), 2063759);

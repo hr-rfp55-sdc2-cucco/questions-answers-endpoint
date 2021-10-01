@@ -14,11 +14,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/qa/questions', (req, res) => {
-  db.getQuestionsByProductID(
-    parseInt(req.query.product_id),
-    req.query?.page,
-    req.query?.count
-  )
+  db.getQuestionsByProductID(parseInt(req.query.product_id), req.query?.page, req.query?.count)
     .then((dataQ) => {
       let promiseQ = dataQ.map((question) => {
         return db.getAllAnswersByQuestionID(question.question_id)
@@ -71,7 +67,7 @@ app.get('/qa/questions', (req, res) => {
       product_id: req.query.product_id,
       results,
     }))
-    .catch((err) => console.error(err));
+    .catch((err) => res.sendStatus(500));
 });
 
 app.get('/qa/questions/:id/answers', (req, res) => {
@@ -108,7 +104,11 @@ app.get('/qa/questions/:id/answers', (req, res) => {
         results,
       });
     })
-    .catch((err) => console.error(err));
+    .catch((err) => res.sendStatus(500));
+})
+
+app.post('/qa/questions', (req, res) => {
+
 })
 
 app.listen(PORT, () => {
