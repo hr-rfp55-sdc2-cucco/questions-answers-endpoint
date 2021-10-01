@@ -20,23 +20,34 @@ app.get('/qa/questions', (req, res) => {
     req.query?.count
   )
     .then((dataQ) => {
-      let results = [];
       let promiseQ = dataQ.map((question) => {
         return db.getAllAnswersByQuestionID(question.question_id)
-          .then((answers) => answers.map((a) => {
-            return {
-              id: a.id,
-              body: a.body,
-              date: a.date,
-              answerer_name: a.answerer_name,
-              helpfulness: a.helpful,
-              photos: [],
-            }
-          }))
+          .then((answers) => {
+            let promiseA = answers.map((ans) => {
+              return db.getPhotosByAnswersID(ans.id)
+                .then((photoArr) => {
+                  return photoArr.map((photo) => photo.url);
+                })
+            })
+            return Promise.all(promiseA)
+              .then((promisePhotos) => {
+                console.log('promise photos:', promisePhotos);
+                return answers.map((a, i) => {
+                  return {
+                    id: a.id,
+                    body: a.body,
+                    date: a.date,
+                    answerer_name: a.answerer_name,
+                    helpfulness: a.helpful,
+                    photos: promisePhotos[i],
+                  };
+                });
+              })
+          })
       })
       Promise.all(promiseQ)
         .then((promiseResults) => {
-          // console.log(promiseResults);
+          console.log('PROMISE RESULTS:', promiseResults);
           return dataQ.map((q, i) => {
             let ansObj = {};
             promiseResults[i].forEach((ans) => ansObj[ans.id] = ans);

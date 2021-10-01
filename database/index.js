@@ -41,13 +41,16 @@ const getAnswersByQuestionID = (questionID, page = 1, count = 5) => {
     .catch((error) => console.error(error.stack));
 };
 
-const getPhotosByAnswersID = (answerID, page = 1, count = 5) => {
+const getPhotosByAnswersID = (answerID) => {
   let queryStr = 'SELECT * FROM answerphotos WHERE answer_id = $1';
-  let queryArgs = [answerID, (page - 1) * count, count];
+  let queryArgs = [answerID];
   // console.log(queryArgs);
   return pool
     .query(queryStr, queryArgs)
-    .then((res) => res.rows)
+    .then((res) => {
+      // pool.end();
+      return res.rows;
+    })
     .catch((error) => console.error(error.stack));
 };
 
@@ -60,6 +63,9 @@ const getPhotosByAnswersID = (answerID, page = 1, count = 5) => {
 //   .catch((e) => console.error(e.stack));
 
 // pool.end();
+
+getPhotosByAnswersID(5);
+
 
 module.exports = {
   getQuestionsByProductID,
