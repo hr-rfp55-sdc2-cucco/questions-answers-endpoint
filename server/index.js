@@ -8,6 +8,8 @@ const app = express();
 const PORT = 3000;
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 
 app.get('/', (req, res) => {
   res.end('Hello World');
@@ -108,7 +110,9 @@ app.get('/qa/questions/:id/answers', (req, res) => {
 })
 
 app.post('/qa/questions', (req, res) => {
-
+  console.log(req.query);
+  db.postQuestion(req.query.product_id, req.query.body, req.query.name, req.query.email)
+    .then((response) => res.sendStatus(201).end());
 })
 
 app.listen(PORT, () => {

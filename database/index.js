@@ -54,6 +54,12 @@ const getPhotosByAnswersID = (answerID) => {
     .catch((error) => console.error(error.stack));
 };
 
+const postQuestion = (productID, body, name, email) => {
+  let queryStr = 'INSERT INTO questions (product_id, question_body, question_date, asker_name, asker_email, reported, helpful) VALUES ($1, $2, current_timestamp(3), $3, $4, false, 0)';
+  let queryArgs = [productID, body, name, email];
+  return pool.query(queryStr, queryArgs)
+}
+
 // pool
 //   .query('SELECT * FROM questions LIMIT 7')
 //   .then((res) => {
@@ -69,4 +75,5 @@ module.exports = {
   getAllAnswersByQuestionID,
   getAnswersByQuestionID,
   getPhotosByAnswersID,
+  postQuestion,
 };
