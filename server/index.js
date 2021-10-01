@@ -28,6 +28,7 @@ app.get('/qa/questions', (req, res) => {
                 .then((photoArr) => {
                   return photoArr.map((photo) => photo.url);
                 })
+                .catch((err) => console.error(err));
             })
             return Promise.all(promiseA)
               .then((promisePhotos) => {
@@ -43,9 +44,11 @@ app.get('/qa/questions', (req, res) => {
                   };
                 });
               })
+              .catch((err) => console.error(err));
           })
+          .catch((err) => console.error(err));
       })
-      Promise.all(promiseQ)
+      return Promise.all(promiseQ)
         .then((promiseResults) => {
           console.log('PROMISE RESULTS:', promiseResults);
           return dataQ.map((q, i) => {
@@ -62,12 +65,12 @@ app.get('/qa/questions', (req, res) => {
             }
           });
         })
-        .then((results) => res.json({
-          product_id: req.query.product_id,
-          results,
-        }))
         .catch((err) => console.error(err));
     })
+    .then((results) => res.json({
+      product_id: req.query.product_id,
+      results,
+    }))
     .catch((err) => console.error(err));
 });
 
