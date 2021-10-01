@@ -1,3 +1,4 @@
+/* eslint-disable radix */
 /* eslint-disable no-console */
 const express = require('express');
 const db = require('../database');
@@ -11,7 +12,11 @@ app.get('/', (req, res) => {
 });
 
 app.get('/qa/questions', (req, res) => {
-  db.getQuestionsByProductID(req.query.product_id);
+  db.getQuestionsByProductID(
+    parseInt(req.query.product_id),
+    req.query?.page,
+    req.query?.count
+  );
   console.log(req.query);
   res.end();
 });

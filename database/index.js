@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 /* eslint-disable no-console */
 const { Pool } = require('pg');
 // const { DBTOKEN } = require('../config');
@@ -11,8 +12,9 @@ const pool = new Pool({
 });
 
 const getQuestionsByProductID = (productID, page = 1, count = 5) => {
-  let queryStr = 'SELECT * FROM questions WHERE id = ? OFFSET ?';
+  let queryStr = 'SELECT * FROM questions WHERE product_id = $1 OFFSET $2';
   let queryArgs = [productID, (page - 1) * count];
+  console.log(queryArgs);
   return pool
     .query(queryStr, queryArgs)
     .then((res) => console.log(res.rows))
