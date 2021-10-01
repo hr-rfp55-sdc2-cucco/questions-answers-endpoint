@@ -12,12 +12,42 @@ const pool = new Pool({
 });
 
 const getQuestionsByProductID = (productID, page = 1, count = 5) => {
-  let queryStr = 'SELECT * FROM questions WHERE product_id = $1 OFFSET $2';
-  let queryArgs = [productID, (page - 1) * count];
-  console.log(queryArgs);
+  let queryStr = 'SELECT * FROM questions WHERE product_id = $1 AND reported = false OFFSET $2 LIMIT $3';
+  let queryArgs = [productID, (page - 1) * count, count];
+  // console.log(queryArgs);
   return pool
     .query(queryStr, queryArgs)
-    .then((res) => console.log(res.rows))
+    .then((res) => res.rows)
+    .catch((error) => console.error(error.stack));
+};
+
+const getAllAnswersByQuestionID = (questionID) => {
+  let queryStr = 'SELECT * FROM answers WHERE question_id = $1';
+  let queryArgs = [questionID];
+  // console.log(queryArgs);
+  return pool
+    .query(queryStr, queryArgs)
+    .then((res) => res.rows)
+    .catch((error) => console.error(error.stack));
+};
+
+const getAnswersByQuestionID = (questionID, page = 1, count = 5) => {
+  let queryStr = 'SELECT * FROM answers WHERE question_id = $1 OFFSET $2 LIMIT $3';
+  let queryArgs = [questionID, (page - 1) * count, count];
+  // console.log(queryArgs);
+  return pool
+    .query(queryStr, queryArgs)
+    .then((res) => res.rows)
+    .catch((error) => console.error(error.stack));
+};
+
+const getPhotosByAnswersID = (answerID, page = 1, count = 5) => {
+  let queryStr = 'SELECT * FROM answerphotos WHERE answer_id = $1';
+  let queryArgs = [answerID, (page - 1) * count, count];
+  // console.log(queryArgs);
+  return pool
+    .query(queryStr, queryArgs)
+    .then((res) => res.rows)
     .catch((error) => console.error(error.stack));
 };
 
@@ -31,4 +61,9 @@ const getQuestionsByProductID = (productID, page = 1, count = 5) => {
 
 // pool.end();
 
-module.exports = { getQuestionsByProductID };
+module.exports = {
+  getQuestionsByProductID,
+  getAllAnswersByQuestionID,
+  getAnswersByQuestionID,
+  getPhotosByAnswersID,
+};

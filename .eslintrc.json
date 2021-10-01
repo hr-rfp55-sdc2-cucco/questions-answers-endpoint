@@ -24,7 +24,7 @@
     "jest/prefer-to-have-length": "warn",
     "jest/valid-expect": "error"
   },
-  "parserOptions": {
-    "ecmaVersion": 2020
-  }
+  // "parserOptions": {
+  //   "ecmaVersion": 2020
+  // }
 }
