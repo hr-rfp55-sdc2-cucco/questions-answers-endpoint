@@ -74,6 +74,43 @@ app.get('/qa/questions', (req, res) => {
     .catch((err) => console.error(err));
 });
 
+app.get('/qa/questions/:id/answers', (req, res) => {
+  db.getAnswersByQuestionID(req.params.id, res.query?.page, res.query?.count)
+    .then((answers) => {
+      let promiseA = answers.map((ans) => {
+        return db.getPhotosByAnswersID(ans.id)
+          .then((photoArr) => {
+            return photoArr.map((photo) => photo.url);
+          })
+          .catch((err) => console.error(err));
+      })
+      return Promise.all(promiseA)
+        .then((promisePhotos) => {
+          console.log('promise photos:', promisePhotos);
+          return answers.map((a, i) => {
+            return {
+              answer_id: a.id,
+              body: a.body,
+              date: a.date,
+              answerer_name: a.answerer_name,
+              helpfulness: a.helpful,
+              photos: promisePhotos[i],
+            };
+          });
+        })
+        .catch((err) => console.error(err));
+    })
+    .then((results) => {
+      res.json({
+        question: req.params.id,
+        page: res.query?.page || 1,
+        count: res.query?.count || 5,
+        results,
+      });
+    })
+    .catch((err) => console.error(err));
+})
+
 app.listen(PORT, () => {
   console.log('Listening on port: ', PORT);
 });
