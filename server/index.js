@@ -132,15 +132,17 @@ app.post('/qa/questions/:question_id/answers', (req, res) => {
 })
 
 app.put('/qa/questions/:question_id/report', (req, res) => {
-  db.report(questions, req.params.question_id)
+  console.log('report an answer', req);
+  db.report('questions', req.params.question_id)
     .then(() => res.sendStatus(204).end())
-    .catch((error) = console.error(error));
+    .catch((error) => console.error(error));
 })
 
 app.put('/qa/answers/:answer_id/report', (req, res) => {
-  db.report(answers, req.params.answer_id)
+  // console.log('report an answer', req);
+  db.report('answers', req.params.answer_id)
     .then(() => res.sendStatus(204).end())
-    .catch((error) = console.error(error));
+    .catch((error) => console.error(error));
 })
 
 app.listen(PORT, () => {

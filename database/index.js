@@ -79,8 +79,9 @@ const postAnswer = (questionID, body, name, email, photos = []) => {
 }
 
 const report = (flag, id) => {
-  let queryStr = 'UPDATE $1 SET reported = true WHERE id = $2';
-  let queryArgs = [flag, id];
+  let queryStr = `UPDATE ${flag} SET reported = true WHERE id = $1`;
+  let queryArgs = [id];
+  console.log('report params:', queryArgs);
   return pool.query(queryStr, queryArgs)
 }
 
