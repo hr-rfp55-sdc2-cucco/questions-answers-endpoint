@@ -65,4 +65,6 @@ SELECT setval(pg_get_serial_sequence('questions', 'id'), 3518963);
 SELECT setval(pg_get_serial_sequence('answers', 'id'), 6879306);
 SELECT setval(pg_get_serial_sequence('answerphotos', 'id'), 2063759);
 
-INSERT INTO answers (question_id, body, date, answerer_name, answerer_email, reported, helpful) VALUES ('1', 'world hello', current_timestamp(3), 'pls work', 'first.last@gmail.com', false, 0) RETURNING id;
+-- INSERT INTO answers (question_id, body, date, answerer_name, answerer_email, reported, helpful) VALUES ('1', 'world hello', current_timestamp(3), 'pls work', 'first.last@gmail.com', false, 0) RETURNING id;
+
+-- update answers set body = 'fix', answerer_name = 'bug', answerer_email = 'first.laste@gmail.com' WHERE id = 6879318;

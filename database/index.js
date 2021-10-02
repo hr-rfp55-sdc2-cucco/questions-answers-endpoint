@@ -24,7 +24,7 @@ const getQuestionsByProductID = (productID, page = 1, count = 5) => {
 const getAllAnswersByQuestionID = (questionID) => {
   let queryStr = 'SELECT * FROM answers WHERE question_id = $1';
   let queryArgs = [questionID];
-  // console.log(queryArgs);
+  console.log('GOING INTO GET ALL');
   return pool
     .query(queryStr, queryArgs)
     .then((res) => res.rows)

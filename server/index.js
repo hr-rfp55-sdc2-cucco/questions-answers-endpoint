@@ -19,7 +19,7 @@ app.get('/qa/questions', (req, res) => {
   db.getQuestionsByProductID(parseInt(req.query.product_id), req.query?.page, req.query?.count)
     .then((dataQ) => {
       let promiseQ = dataQ.map((question) => {
-        return db.getAllAnswersByQuestionID(question.question_id)
+        return db.getAllAnswersByQuestionID(question.id)
           .then((answers) => {
             let promiseA = answers.map((ans) => {
               return db.getPhotosByAnswersID(ans.id)
