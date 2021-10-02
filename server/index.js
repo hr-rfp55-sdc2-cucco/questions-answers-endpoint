@@ -53,7 +53,7 @@ app.get('/qa/questions', (req, res) => {
             let ansObj = {};
             promiseResults[i].forEach((ans) => ansObj[ans.id] = ans);
             return {
-              question_id: q.question_id,
+              question_id: q.id,
               question_body: q.question_body,
               question_date: q.question_date,
               asker_name: q.asker_name,
@@ -125,6 +125,18 @@ app.post('/qa/questions/:id/answers', (req, res) => {
       res.sendStatus(201).end();
     })
     .catch((error) => console.error('error', error));
+})
+
+app.put('/qa/questions/:id/report', (req, res) => {
+  db.report(questions, req.params.id)
+    .then(() => res.sendStatus(204).end())
+    .catch((error) = console.error(error));
+})
+
+app.put('/qa/answers/:id/report', (req, res) => {
+  db.report(answers, req.params.id)
+    .then(() => res.sendStatus(204).end())
+    .catch((error) = console.error(error));
 })
 
 app.listen(PORT, () => {

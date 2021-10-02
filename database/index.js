@@ -22,7 +22,7 @@ const getQuestionsByProductID = (productID, page = 1, count = 5) => {
 };
 
 const getAllAnswersByQuestionID = (questionID) => {
-  let queryStr = 'SELECT * FROM answers WHERE question_id = $1';
+  let queryStr = 'SELECT * FROM answers WHERE id = $1';
   let queryArgs = [questionID];
   // console.log(queryArgs);
   return pool
@@ -32,7 +32,7 @@ const getAllAnswersByQuestionID = (questionID) => {
 };
 
 const getAnswersByQuestionID = (questionID, page = 1, count = 5) => {
-  let queryStr = 'SELECT * FROM answers WHERE question_id = $1 AND reported = false OFFSET $2 LIMIT $3';
+  let queryStr = 'SELECT * FROM answers WHERE id = $1 AND reported = false OFFSET $2 LIMIT $3';
   let queryArgs = [questionID, (page - 1) * count, count];
   // console.log(queryArgs);
   return pool
@@ -78,6 +78,16 @@ const postAnswer = (questionID, body, name, email, photos = []) => {
     .catch((err) => console.error(err));
 }
 
+const report = (flag, id) => {
+  let queryStr = 'UPDATE $1 SET reported = true WHERE id = $2';
+  let queryArgs = [flag, id];
+  return pool.query(queryStr, queryArgs)
+}
+
+const helpful = (flag, id) => {
+
+}
+
 // pool
 //   .query('SELECT * FROM questions LIMIT 7')
 //   .then((res) => {
@@ -95,4 +105,6 @@ module.exports = {
   getPhotosByAnswersID,
   postQuestion,
   postAnswer,
+  report,
+  helpful,
 };

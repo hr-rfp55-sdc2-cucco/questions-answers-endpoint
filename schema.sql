@@ -9,7 +9,7 @@ DROP TABLE questions;
 
 
 CREATE TABLE questions (
-  question_id serial PRIMARY KEY,
+  id serial PRIMARY KEY,
   product_id int,
   question_body text,
   question_date bigint,
@@ -21,7 +21,7 @@ CREATE TABLE questions (
 
 CREATE TABLE answers (
   id serial PRIMARY KEY,
-  question_id int REFERENCES questions (question_id),
+  question_id int REFERENCES questions (id),
   body text,
   date bigint,
   answerer_name varchar,
@@ -61,6 +61,8 @@ CREATE INDEX questions_by_pid_reported_index ON questions (product_id, reported)
 CREATE INDEX answers_by_qid_reported_index ON answers (question_id, reported);
 CREATE INDEX answerphotos_by_answer_id_index ON answerphotos (answer_id);
 
-SELECT setval(pg_get_serial_sequence('questions', 'question_id'), 3518963);
+SELECT setval(pg_get_serial_sequence('questions', 'id'), 3518963);
 SELECT setval(pg_get_serial_sequence('answers', 'id'), 6879306);
 SELECT setval(pg_get_serial_sequence('answerphotos', 'id'), 2063759);
+
+INSERT INTO answers (question_id, body, date, answerer_name, answerer_email, reported, helpful) VALUES ('1', 'world hello', current_timestamp(3), 'pls work', 'first.last@gmail.com', false, 0) RETURNING id;
