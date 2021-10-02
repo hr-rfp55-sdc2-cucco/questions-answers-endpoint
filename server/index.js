@@ -82,7 +82,12 @@ app.get('/qa/questions/:question_id/answers', (req, res) => {
       let promiseA = answers.map((ans) => {
         return db.getPhotosByAnswersID(ans.id)
           .then((photoArr) => {
-            return photoArr.map((photo) => photo.url);
+            return photoArr.map((photo) => {
+              return {
+                id: ans.id,
+                url: photo.url
+              }
+            });
           })
           .catch((err) => console.error(err));
       })
@@ -122,8 +127,8 @@ app.post('/qa/questions', (req, res) => {
 })
 
 app.post('/qa/questions/:question_id/answers', (req, res) => {
-  // console.log('trying to post answer', req.params, req.query);
-  db.postAnswer(req.params.question_id, req.query.body, req.query.name, req.query.email, req.query?.photos)
+  // console.log('trying to post answer', req.params, req.body);
+  db.postAnswer(req.params.question_id, req.body.body, req.body.name, req.body.email, req.body?.photos)
     .then(() => {
       // console.log(response);
       res.sendStatus(201).end();
