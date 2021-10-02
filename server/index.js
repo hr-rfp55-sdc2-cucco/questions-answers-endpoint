@@ -145,6 +145,18 @@ app.put('/qa/answers/:answer_id/report', (req, res) => {
     .catch((error) => console.error(error));
 })
 
+app.put('/qa/questions/:question_id/helpful', (req, res) => {
+  db.helpful('questions', req.params.question_id)
+    .then(() => res.sendStatus(204).end())
+    .catch((error) => console.error(error));
+})
+
+app.put('/qa/answers/:answer_id/helpful', (req, res) => {
+  db.helpful('answers', req.params.answer_id)
+    .then(() => res.sendStatus(204).end())
+    .catch((error) => console.error(error));
+})
+
 app.listen(PORT, () => {
   console.log('Listening on port: ', PORT);
 });

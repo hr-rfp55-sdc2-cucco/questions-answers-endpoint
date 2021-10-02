@@ -81,12 +81,15 @@ const postAnswer = (questionID, body, name, email, photos = []) => {
 const report = (flag, id) => {
   let queryStr = `UPDATE ${flag} SET reported = true WHERE id = $1`;
   let queryArgs = [id];
-  console.log('report params:', queryArgs);
+  // console.log('report params:', queryArgs);
   return pool.query(queryStr, queryArgs)
 }
 
 const helpful = (flag, id) => {
-
+  let queryStr = `UPDATE ${flag} SET helpful = helpful + 1 WHERE id = $1`;
+  let queryArgs = [id];
+  console.log('helpfulness params:', queryArgs);
+  return pool.query(queryStr, queryArgs)
 }
 
 // pool
