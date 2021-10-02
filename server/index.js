@@ -30,7 +30,7 @@ app.get('/qa/questions', (req, res) => {
             })
             return Promise.all(promiseA)
               .then((promisePhotos) => {
-                console.log('promise photos:', promisePhotos);
+                // console.log('promise photos:', promisePhotos);
                 return answers.map((a, i) => {
                   return {
                     id: a.id,
@@ -48,7 +48,7 @@ app.get('/qa/questions', (req, res) => {
       })
       return Promise.all(promiseQ)
         .then((promiseResults) => {
-          console.log('PROMISE RESULTS:', promiseResults);
+          // console.log('PROMISE RESULTS:', promiseResults);
           return dataQ.map((q, i) => {
             let ansObj = {};
             promiseResults[i].forEach((ans) => ansObj[ans.id] = ans);
@@ -65,15 +65,19 @@ app.get('/qa/questions', (req, res) => {
         })
         .catch((err) => console.error(err));
     })
-    .then((results) => res.json({
-      product_id: req.query.product_id,
-      results,
-    }))
+    .then((results) => {
+      console.log('got questions for:', req.query.product_id);
+      return res.json({
+        product_id: req.query.product_id,
+        results,
+      });
+    })
     .catch((err) => res.sendStatus(500));
 });
 
-app.get('/qa/questions/:id/answers', (req, res) => {
-  db.getAnswersByQuestionID(req.params.id, res.query?.page, res.query?.count)
+app.get('/qa/questions/:question_id/answers', (req, res) => {
+  console.log('params:', req.params, 'query', req.query)
+  db.getAnswersByQuestionID(req.params.question_id, res.query?.page, res.query?.count)
     .then((answers) => {
       let promiseA = answers.map((ans) => {
         return db.getPhotosByAnswersID(ans.id)
@@ -84,7 +88,7 @@ app.get('/qa/questions/:id/answers', (req, res) => {
       })
       return Promise.all(promiseA)
         .then((promisePhotos) => {
-          console.log('promise photos:', promisePhotos);
+          // console.log('promise photos:', promisePhotos);
           return answers.map((a, i) => {
             return {
               answer_id: a.id,
@@ -99,8 +103,9 @@ app.get('/qa/questions/:id/answers', (req, res) => {
         .catch((err) => console.error(err));
     })
     .then((results) => {
-      res.json({
-        question: req.params.id,
+      console.log('got answers for for:', req.params.question_id);
+      return res.json({
+        question: req.params.question_id,
         page: res.query?.page || 1,
         count: res.query?.count || 5,
         results,
@@ -114,12 +119,11 @@ app.post('/qa/questions', (req, res) => {
   db.postQuestion(req.query.product_id, req.query.body, req.query.name, req.query.email)
     .then((response) => res.sendStatus(201).end())
     .catch((error) => console.error(error));
-
 })
 
-app.post('/qa/questions/:id/answers', (req, res) => {
-  console.log(req.params.id, req.query.body, req.query.name, req.query.email, req.query?.photos);
-  db.postAnswer(req.params.id, req.query.body, req.query.name, req.query.email, req.query?.photos)
+app.post('/qa/questions/:question_id/answers', (req, res) => {
+  // console.log('trying to post answer', req.params, req.query);
+  db.postAnswer(req.params.question_id, req.query.body, req.query.name, req.query.email, req.query?.photos)
     .then(() => {
       // console.log(response);
       res.sendStatus(201).end();
@@ -127,14 +131,14 @@ app.post('/qa/questions/:id/answers', (req, res) => {
     .catch((error) => console.error('error', error));
 })
 
-app.put('/qa/questions/:id/report', (req, res) => {
-  db.report(questions, req.params.id)
+app.put('/qa/questions/:question_id/report', (req, res) => {
+  db.report(questions, req.params.question_id)
     .then(() => res.sendStatus(204).end())
     .catch((error) = console.error(error));
 })
 
-app.put('/qa/answers/:id/report', (req, res) => {
-  db.report(answers, req.params.id)
+app.put('/qa/answers/:answer_id/report', (req, res) => {
+  db.report(answers, req.params.answer_id)
     .then(() => res.sendStatus(204).end())
     .catch((error) = console.error(error));
 })
