@@ -57,7 +57,25 @@ const getPhotosByAnswersID = (answerID) => {
 const postQuestion = (productID, body, name, email) => {
   let queryStr = 'INSERT INTO questions (product_id, question_body, question_date, asker_name, asker_email, reported, helpful) VALUES ($1, $2, current_timestamp(3), $3, $4, false, 0)';
   let queryArgs = [productID, body, name, email];
+  return pool.query(queryStr, queryArgs);
+}
+
+const postAnswer = (questionID, body, name, email, photos = []) => {
+  let queryStr = 'INSERT INTO answers (question_id, body, date, answerer_name, answerer_email, reported, helpful) VALUES ($1, $2, current_timestamp(3), $3, $4, false, 0) RETURNING id';
+  let queryArgs = [questionID, body, name, email];
   return pool.query(queryStr, queryArgs)
+    .then((res) => {
+      if (photos) {
+        console.log(photos);
+        return photos.map((photo) => {
+          let queryStr = 'INSERT INTO answerphotos (answer_id, url) VALUES ($1, $2)';
+          let queryArgs = [res.rows[0].id, photo];
+          return pool.query(queryStr, queryArgs)
+            .catch((err) => console.error(err));
+        })
+      } else { return }
+    })
+    .catch((err) => console.error(err));
 }
 
 // pool
@@ -76,4 +94,5 @@ module.exports = {
   getAnswersByQuestionID,
   getPhotosByAnswersID,
   postQuestion,
+  postAnswer,
 };

@@ -112,7 +112,19 @@ app.get('/qa/questions/:id/answers', (req, res) => {
 app.post('/qa/questions', (req, res) => {
   console.log(req.query);
   db.postQuestion(req.query.product_id, req.query.body, req.query.name, req.query.email)
-    .then((response) => res.sendStatus(201).end());
+    .then((response) => res.sendStatus(201).end())
+    .catch((error) => console.error(error));
+
+})
+
+app.post('/qa/questions/:id/answers', (req, res) => {
+  console.log(req.params.id, req.query.body, req.query.name, req.query.email, req.query?.photos);
+  db.postAnswer(req.params.id, req.query.body, req.query.name, req.query.email, req.query?.photos)
+    .then(() => {
+      // console.log(response);
+      res.sendStatus(201).end();
+    })
+    .catch((error) => console.error('error', error));
 })
 
 app.listen(PORT, () => {
