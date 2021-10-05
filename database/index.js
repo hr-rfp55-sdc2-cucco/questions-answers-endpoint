@@ -24,7 +24,7 @@ const getQuestionsByProductID = (productID, page = 1, count = 5) => {
 const getAllAnswersByQuestionID = (questionID) => {
   let queryStr = 'SELECT * FROM answers WHERE question_id = $1';
   let queryArgs = [questionID];
-  console.log('GOING INTO GET ALL');
+  // console.log('GOING INTO GET ALL');
   return pool
     .query(queryStr, queryArgs)
     .then((res) => res.rows)
@@ -32,7 +32,7 @@ const getAllAnswersByQuestionID = (questionID) => {
 };
 
 const getAnswersByQuestionID = (questionID, page = 1, count = 5) => {
-  let queryStr = 'SELECT * FROM answers WHERE question_id = $1 AND reported = false OFFSET $2 LIMIT $3';
+  let queryStr = 'SELECT id AS answer_id, body, date, answerer_name, helpful AS helpfulness FROM answers WHERE question_id = $1 AND reported = false OFFSET $2 LIMIT $3';
   let queryArgs = [questionID, (page - 1) * count, count];
   // console.log(queryArgs);
   return pool
@@ -42,7 +42,7 @@ const getAnswersByQuestionID = (questionID, page = 1, count = 5) => {
 };
 
 const getPhotosByAnswersID = (answerID) => {
-  let queryStr = 'SELECT * FROM answerphotos WHERE answer_id = $1';
+  let queryStr = 'SELECT id, url FROM answerphotos WHERE answer_id = $1';
   let queryArgs = [answerID];
   // console.log(queryArgs);
   return pool
@@ -66,7 +66,7 @@ const postAnswer = (questionID, body, name, email, photos = []) => {
   return pool.query(queryStr, queryArgs)
     .then((res) => {
       if (photos) {
-        console.log(photos);
+        // console.log(photos);
         return photos.map((photo) => {
           let queryStr = 'INSERT INTO answerphotos (answer_id, url) VALUES ($1, $2)';
           let queryArgs = [res.rows[0].id, photo];
@@ -88,7 +88,7 @@ const report = (flag, id) => {
 const helpful = (flag, id) => {
   let queryStr = `UPDATE ${flag} SET helpful = helpful + 1 WHERE id = $1`;
   let queryArgs = [id];
-  console.log('helpfulness params:', queryArgs);
+  // console.log('helpfulness params:', queryArgs);
   return pool.query(queryStr, queryArgs)
 }
 

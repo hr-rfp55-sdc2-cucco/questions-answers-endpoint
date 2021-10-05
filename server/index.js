@@ -66,7 +66,7 @@ app.get('/qa/questions', (req, res) => {
         .catch((err) => console.error(err));
     })
     .then((results) => {
-      console.log('got questions for:', req.query.product_id);
+      // console.log('got questions for:', req.query.product_id);
       return res.json({
         product_id: req.query.product_id,
         results,
@@ -76,39 +76,35 @@ app.get('/qa/questions', (req, res) => {
 });
 
 app.get('/qa/questions/:question_id/answers', (req, res) => {
-  console.log('params:', req.params, 'query', req.query)
+  // console.log('params:', req.params, 'query', req.query)
   db.getAnswersByQuestionID(req.params.question_id, res.query?.page, res.query?.count)
     .then((answers) => {
+      // console.log('answers', answers);
       let promiseA = answers.map((ans) => {
-        return db.getPhotosByAnswersID(ans.id)
+        // console.log(ans.answer_id);
+        return db.getPhotosByAnswersID(ans.answer_id)
           .then((photoArr) => {
+            console.log('photoarr', photoArr);
             return photoArr.map((photo) => {
-              return {
-                id: ans.id,
-                url: photo.url
-              }
+              return photo;
             });
           })
           .catch((err) => console.error(err));
       })
       return Promise.all(promiseA)
         .then((promisePhotos) => {
-          // console.log('promise photos:', promisePhotos);
+          console.log('promise photos:', promisePhotos);
           return answers.map((a, i) => {
-            return {
-              answer_id: a.id,
-              body: a.body,
-              date: a.date,
-              answerer_name: a.answerer_name,
-              helpfulness: a.helpful,
-              photos: promisePhotos[i],
-            };
+            // console.log('ANSWER OBJECT', a);
+            console.log(promisePhotos[i]);
+            a.photos = promisePhotos[i];
+            return a;
           });
         })
         .catch((err) => console.error(err));
     })
     .then((results) => {
-      console.log('got answers for for:', req.params.question_id);
+      // console.log('got answers for for:', req.params.question_id);
       return res.json({
         question: req.params.question_id,
         page: res.query?.page || 1,
@@ -120,7 +116,7 @@ app.get('/qa/questions/:question_id/answers', (req, res) => {
 })
 
 app.post('/qa/questions', (req, res) => {
-  console.log(req.query);
+  // console.log(req.query);
   db.postQuestion(req.query.product_id, req.query.body, req.query.name, req.query.email)
     .then((response) => res.sendStatus(201).end())
     .catch((error) => console.error(error));
@@ -137,7 +133,7 @@ app.post('/qa/questions/:question_id/answers', (req, res) => {
 })
 
 app.put('/qa/questions/:question_id/report', (req, res) => {
-  console.log('report an answer', req);
+  // console.log('report an answer', req);
   db.report('questions', req.params.question_id)
     .then(() => res.sendStatus(204).end())
     .catch((error) => console.error(error));
