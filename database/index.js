@@ -31,6 +31,39 @@ const getAllAnswersByQuestionID = (questionID) => {
     .catch((error) => console.error(error.stack));
 };
 
+const getAnswersWithPhotos = (questionID, page = 1, count = 5) => {
+  let queryStr = `SELECT
+  answers.id AS answer_id,
+  answers.body,
+  answers.date,
+  answers.answerer_name,
+  answers.helpful AS helpfulness,
+  COALESCE(
+    JSON_AGG(
+      json_build_object(
+        'id', answerphotos.id,
+        'url', answerphotos.url)
+      ORDER BY answerphotos.id ASC
+      )
+    FILTER (WHERE answerphotos.id IS NOT NULL)
+    , '[]')
+    AS photos
+  FROM answers
+  LEFT JOIN answerphotos
+    ON answers.id = answerphotos.answer_id
+  WHERE answers.question_id = $1
+    AND answers.reported = false
+  GROUP BY answers.id
+  OFFSET $2 ROWS
+  LIMIT $3`;
+  let queryArgs = [questionID, (page - 1) * count, count];
+  // console.log(queryArgs);
+  return pool
+    .query(queryStr, queryArgs)
+    .then((res) => res.rows)
+    .catch((error) => console.error(error.stack));
+};
+
 const getAnswersByQuestionID = (questionID, page = 1, count = 5) => {
   let queryStr = 'SELECT id AS answer_id, body, date, answerer_name, helpful AS helpfulness FROM answers WHERE question_id = $1 AND reported = false OFFSET $2 LIMIT $3';
   let queryArgs = [questionID, (page - 1) * count, count];
@@ -111,4 +144,5 @@ module.exports = {
   postAnswer,
   report,
   helpful,
+  getAnswersWithPhotos
 };

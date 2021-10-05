@@ -76,43 +76,14 @@ app.get('/qa/questions', (req, res) => {
 });
 
 app.get('/qa/questions/:question_id/answers', (req, res) => {
-  // console.log('params:', req.params, 'query', req.query)
-  db.getAnswersByQuestionID(req.params.question_id, res.query?.page, res.query?.count)
-    .then((answers) => {
-      // console.log('answers', answers);
-      let promiseA = answers.map((ans) => {
-        // console.log(ans.answer_id);
-        return db.getPhotosByAnswersID(ans.answer_id)
-          .then((photoArr) => {
-            console.log('photoarr', photoArr);
-            return photoArr.map((photo) => {
-              return photo;
-            });
-          })
-          .catch((err) => console.error(err));
-      })
-      return Promise.all(promiseA)
-        .then((promisePhotos) => {
-          console.log('promise photos:', promisePhotos);
-          return answers.map((a, i) => {
-            // console.log('ANSWER OBJECT', a);
-            console.log(promisePhotos[i]);
-            a.photos = promisePhotos[i];
-            return a;
-          });
-        })
-        .catch((err) => console.error(err));
-    })
-    .then((results) => {
-      // console.log('got answers for for:', req.params.question_id);
-      return res.json({
-        question: req.params.question_id,
-        page: res.query?.page || 1,
-        count: res.query?.count || 5,
-        results,
-      });
-    })
-    .catch((err) => res.sendStatus(500));
+  db.getAnswersWithPhotos(req.params.question_id, res.query?.page, res.query?.count)
+    .then((results) => res.json({
+      question: req.params.question_id,
+      page: res.query?.page || 1,
+      count: res.query?.count || 5,
+      results,
+    }))
+    .catch((e) => res.sendStatus(500));
 })
 
 app.post('/qa/questions', (req, res) => {
@@ -158,6 +129,12 @@ app.put('/qa/answers/:answer_id/helpful', (req, res) => {
     .catch((error) => console.error(error));
 })
 
-app.listen(PORT, () => {
+const serverApp = app.listen(PORT, () => {
   console.log('Listening on port: ', PORT);
+});
+
+serverApp.on('connection', function (socket) {
+  // console.log("A new connection was made by a client.");
+  socket.setTimeout(30 * 1000);
+  // 30 second timeout. Change this as you see fit.
 });
