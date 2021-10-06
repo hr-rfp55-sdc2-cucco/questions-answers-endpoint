@@ -25,10 +25,12 @@
     "prettier": "^2.4.1"
   },
   "dependencies": {
+    "@newrelic/native-metrics": "^7.0.2",
     "eslint-plugin-import": "^2.24.2",
     "eslint-plugin-jest": "^24.5.0",
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "express": "^4.17.1",
+    "newrelic": "^8.4.0",
     "pg": "^8.7.1"
   }
 }

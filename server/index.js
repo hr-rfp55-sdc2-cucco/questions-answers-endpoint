@@ -2,6 +2,7 @@
 /* eslint-disable no-console */
 const express = require('express');
 const db = require('../database');
+const newRelic = require('newrelic');
 
 const app = express();
 
@@ -129,12 +130,6 @@ app.put('/qa/answers/:answer_id/helpful', (req, res) => {
     .catch((error) => console.error(error));
 })
 
-const serverApp = app.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log('Listening on port: ', PORT);
-});
-
-serverApp.on('connection', function (socket) {
-  // console.log("A new connection was made by a client.");
-  socket.setTimeout(30 * 1000);
-  // 30 second timeout. Change this as you see fit.
 });
