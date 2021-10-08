@@ -1,13 +1,13 @@
 /* eslint-disable prefer-const */
 /* eslint-disable no-console */
 const { Pool } = require('pg');
-// const { DBTOKEN } = require('../config');
+const { DBTOKEN } = require('../config');
 
 const pool = new Pool({
-  user: 'ilee',
-  host: 'localhost',
+  user: 'ubuntu',
+  host: '3.101.54.225',
   database: 'sdc2db',
-  // password: DBTOKEN,
+  password: DBTOKEN,
   port: 5432,
 });
 
