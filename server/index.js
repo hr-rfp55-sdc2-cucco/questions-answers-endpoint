@@ -16,6 +16,10 @@ app.get('/', (req, res) => {
   res.end('Hello World');
 });
 
+app.get('/loaderio-f3e5be8d0a10ae98ae742adb69551559', (req, res) => {
+  res.end('loaderio-f3e5be8d0a10ae98ae742adb69551559');
+})
+
 app.get('/qa/questions', (req, res) => {
   db.getQuestionsByProductID(parseInt(req.query.product_id), req.query?.page, req.query?.count)
     .then((dataQ) => {
