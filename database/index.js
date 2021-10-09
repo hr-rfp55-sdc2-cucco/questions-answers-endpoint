@@ -11,25 +11,50 @@ const pool = new Pool({
   port: 5432,
 });
 
-const getQuestionsByProductID = (productID, page = 1, count = 5) => {
-  let queryStr = 'SELECT * FROM questions WHERE product_id = $1 AND reported = false OFFSET $2 LIMIT $3';
-  let queryArgs = [productID, (page - 1) * count, count];
-  // console.log(queryArgs);
-  return pool
-    .query(queryStr, queryArgs)
-    .then((res) => res.rows)
-    .catch((error) => console.error(error.stack));
-};
 
-const getAllAnswersByQuestionID = (questionID) => {
-  let queryStr = 'SELECT * FROM answers WHERE question_id = $1';
-  let queryArgs = [questionID];
-  // console.log('GOING INTO GET ALL');
+const getQuestionsWithAnswersWithPhotos = (productID, page = 1, count = 5) => {
+  let queryStr = `
+  SELECT
+    questions.id AS question_id,
+    questions.question_body,
+    questions.question_date,
+    questions.asker_name,
+    questions.helpful AS question_helpfulness,
+    questions.reported,
+    COALESCE(
+      JSON_AGG(
+        json_build_object(
+          'id', answers.id,
+          'body', answers.body,
+          'data', answers.date,
+          'answerer_name', answers.answerer_name,
+          'helpfulness', answers.helpful,
+          'photos', (
+                  select coalesce(json_agg(
+                      t.url
+                    ), '[]'::json) from
+                    (SELECT
+                        answerphotos.url
+                  FROM answerphotos WHERE answerphotos.answer_id = answers.id) AS t
+                )
+        )
+      ) FILTER (WHERE answers.id IS NOT NULL)
+    , '[]'
+    )
+    AS answers
+    FROM questions
+    LEFT JOIN answers ON questions.id = answers.question_id
+    WHERE questions.product_id = $1 and questions.reported = false
+    GROUP BY questions.id
+    OFFSET $2
+    LIMIT $3
+    `;
+  let queryArgs = [productID, (page - 1) * count, count];
   return pool
     .query(queryStr, queryArgs)
     .then((res) => res.rows)
     .catch((error) => console.error(error.stack));
-};
+}
 
 const getAnswersWithPhotos = (questionID, page = 1, count = 5) => {
   let queryStr = `SELECT
@@ -62,30 +87,7 @@ const getAnswersWithPhotos = (questionID, page = 1, count = 5) => {
     .query(queryStr, queryArgs)
     .then((res) => res.rows)
     .catch((error) => console.error(error.stack));
-};
-
-const getAnswersByQuestionID = (questionID, page = 1, count = 5) => {
-  let queryStr = 'SELECT id AS answer_id, body, date, answerer_name, helpful AS helpfulness FROM answers WHERE question_id = $1 AND reported = false OFFSET $2 LIMIT $3';
-  let queryArgs = [questionID, (page - 1) * count, count];
-  // console.log(queryArgs);
-  return pool
-    .query(queryStr, queryArgs)
-    .then((res) => res.rows)
-    .catch((error) => console.error(error.stack));
-};
-
-const getPhotosByAnswersID = (answerID) => {
-  let queryStr = 'SELECT id, url FROM answerphotos WHERE answer_id = $1';
-  let queryArgs = [answerID];
-  // console.log(queryArgs);
-  return pool
-    .query(queryStr, queryArgs)
-    .then((res) => {
-      // pool.end();
-      return res.rows;
-    })
-    .catch((error) => console.error(error.stack));
-};
+}
 
 const postQuestion = (productID, body, name, email) => {
   let queryStr = 'INSERT INTO questions (product_id, question_body, question_date, asker_name, asker_email, reported, helpful) VALUES ($1, $2, current_timestamp(3), $3, $4, false, 0)';
@@ -136,13 +138,10 @@ const helpful = (flag, id) => {
 // pool.end();
 
 module.exports = {
-  getQuestionsByProductID,
-  getAllAnswersByQuestionID,
-  getAnswersByQuestionID,
-  getPhotosByAnswersID,
   postQuestion,
   postAnswer,
   report,
   helpful,
-  getAnswersWithPhotos
+  getAnswersWithPhotos,
+  getQuestionsWithAnswersWithPhotos
 };
