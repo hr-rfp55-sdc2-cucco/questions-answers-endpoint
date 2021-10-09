@@ -31,6 +31,51 @@ const getAllAnswersByQuestionID = (questionID) => {
     .catch((error) => console.error(error.stack));
 };
 
+const getQuestionsWithAnswersWithPhotos = (productID, page = 1, count = 5) => {
+  let queryStr = `
+  SELECT
+    questions.id AS question_id,
+    questions.question_body,
+    questions.question_date,
+    questions.asker_name,
+    questions.helpful AS question_helpfulness,
+    questions.reported,
+    COALESCE(
+      JSON_AGG(
+        json_build_object(
+          'id', answers.id,
+          'body', answers.body,
+          'data', answers.date,
+          'answerer_name', answers.answerer_name,
+          'helpfulness', answers.helpful,
+          'photos', (
+                  select coalesce(json_agg(
+                      t.url
+                    ), '[]'::json) from
+                    (SELECT
+                        answerphotos.url
+                  FROM answerphotos WHERE answerphotos.answer_id = answers.id) AS t
+                )
+        )
+      ) FILTER (WHERE answers.id IS NOT NULL)
+    , '[]'
+    )
+    AS answers
+    FROM questions
+    LEFT JOIN answers ON questions.id = answers.question_id
+    WHERE questions.product_id = $1 and questions.reported = false
+    GROUP BY questions.id
+    OFFSET $2
+    LIMIT $3
+    `;
+  let queryArgs = [productID, (page - 1) * count, count];
+  // console.log(queryArgs);
+  return pool
+    .query(queryStr, queryArgs)
+    .then((res) => res.rows)
+    .catch((error) => console.error(error.stack));
+}
+
 const getAnswersWithPhotos = (questionID, page = 1, count = 5) => {
   let queryStr = `SELECT
   answers.id AS answer_id,
@@ -144,5 +189,6 @@ module.exports = {
   postAnswer,
   report,
   helpful,
-  getAnswersWithPhotos
+  getAnswersWithPhotos,
+  getQuestionsWithAnswersWithPhotos
 };
